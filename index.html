@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <!-- Meta SEO -->
+    <title>Ajiboost - Votre Marketing, en clair. | Agence Digitale Maroc</title>
+    <meta name="description" content="Ajiboost est l'agence digitale au Maroc qui transforme vos données complexes en résultats simples. SEO, Web Design, Stratégie.">
+    <meta name="keywords" content="ajiboost, agence marketing digital maroc, agence seo maroc, design web maroc, saas style, maybe style">
+    <meta name="author" content="Ajiboost Team">
+    <meta name="robots" content="index, follow">
+
+    <!-- Scripts et Polices -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome (pour les icônes) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- GSAP (Pour les animations de fade-in) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* PALETTE: Noir, Blanc & Orange */
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #0F0F0F; /* Fond Noir (Style Maybe) */
+            color: #E0E0E0; /* Texte Blanc Cassé */
+            overflow-x: hidden;
+        }
+        
+        /* ==================================================================
+        == CSS POUR LE CURSEUR (ORANGE)
+        ==================================================================
+        */
+        body {
+            cursor: none;
+        }
+        #cursor-dot {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background-color: #f97316; /* Orange */
+            border-radius: 50%;
+            pointer-events: none; 
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease;
+        }
+        #cursor-outline {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid #f97316; /* Orange */
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            transition: transform 0.15s ease-out, opacity 0.2s ease, width 0.3s ease, height 0.3s ease;
+        }
+        #cursor-dot.hover { width: 0px; height: 0px; }
+        #cursor-outline.hover { 
+            width: 60px; 
+            height: 60px;
+            background-color: rgba(249, 115, 22, 0.2);
+            border-color: transparent;
+        }
+
+        /* ==================================================================
+        == CSS POUR LE PRÉ-CHARGEUR (Style Maybe)
+        ==================================================================
+        */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: #0F0F0F; /* Fond Noir */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.75s ease;
+        }
+        #preloader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.loading {
+            overflow: hidden;
+        }
+        .loader-logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #f97316;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ==================================================================
+        == CSS POUR LA MODALE (MODE SOMBRE)
+        ==================================================================
+        */
+        .modal { z-index: 100; visibility: hidden; transition: visibility 0.3s ease-out; }
+        .modal.is-active { visibility: visible; }
+        body.modal-open { overflow: hidden; }
+        .modal-overlay { opacity: 0; transition: backdrop-filter 0.2s ease-out, opacity 0.2s ease-out; }
+        .modal.is-active .modal-overlay { opacity: 1; backdrop-filter: blur(5px); }
+        .modal-content { opacity: 0; transform: scale(0.9); transition: opacity 0.2s ease-out, transform 0.2s ease-out; }
+        .modal.is-active .modal-content { opacity: 1; transform: scale(1); }
+        .modal-dark-input { background-color: #1A1A1A; border: 1px solid #333; color: #E0E0E0; transition: border-color 0.3s ease; }
+        .modal-dark-input:focus { border-color: #f97316; background-color: #222; ring: 0; outline: none; }
+        .modal select:required:invalid { color: #777; }
+        
+        /* CORRECTION BUG FORMULAIRE */
+        .modal option { 
+            color: #1f2937; /* Texte sombre */
+            background-color: #FFFFFF; /* Fond clair pour la liste */
+        }
+
+        /* ==================================================================
+        == NOUVEAU: CSS POUR MARQUEE (Style Maybe)
+        ==================================================================
+        */
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            background-color: #f97316; /* Fond Orange */
+            color: #ffffff; /* Texte Blanc */
+            padding: 1rem 0;
+            border-top: 2px solid #ea580c;
+            border-bottom: 2px solid #ea580c;
+        }
+        .marquee-track {
+            display: flex;
+            width: max-content;
+            animation: scroll 30s linear infinite;
+        }
+        .marquee-track span {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700; /* font-bold */
+            margin: 0 2.5rem; /* Espace */
+            white-space: nowrap;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } /* Défile de 50% */
+        }
+        
+        /* ==================================================================
+        == NOUVEAU: CSS POUR GRILLE DE SERVICES (Style Maybe)
+        ==================================================================
+        */
+        .feature-card {
+            background-color: #0F0F0F; /* Fond Noir */
+            border: 1px solid #333; /* Bordure grise */
+            border-radius: 1rem; /* rounded-xl */
+            padding: 1.5rem; /* p-6 */
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card:hover {
+            border-color: #f97316; /* Bordure Orange */
+            transform: translateY(-5px);
+        }
+
+        /* ==================================================================
+        == NOUVEAU: CSS POUR L'ACCORDÉON FAQ (Style Maybe)
+        ==================================================================
+        */
+        .accordion-item {
+            border-bottom: 1px solid #333; /* border-gray-700 */
+        }
+        .accordion-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0; /* py-6 */
+            text-align: left;
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            color: #E0E0E0; /* text-gray-200 */
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease;
+            font-size: 1rem;
+            color: #f97316; /* Orange */
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            color: #9ca3af; /* text-gray-400 */
+            font-size: 1rem; /* text-base */
+        }
+        .accordion-content p {
+            padding-bottom: 1.5rem; /* pb-6 */
+        }
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        /* ==================================================================
+        == NOUVEAU: CSS POUR BOUTON (Style Maybe)
+        ==================================================================
+        */
+        .btn-primary {
+            background-color: #f97316; /* Orange */
+            color: #ffffff;
+            font-weight: 600; /* font-semibold */
+            padding: 0.75rem 1.5rem; /* px-6 py-3 */
+            border-radius: 9999px; /* rounded-full */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2); /* Ombre Orange */
+        }
+        .btn-primary:hover {
+            background-color: #fb923c; /* Orange plus clair */
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.3);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background-color: #1A1A1A; /* Fond sombre */
+            color: #E0E0E0;
+            border: 1px solid #333;
+            font-weight: 600; /* font-semibold */
+            padding: 0.75rem 1.5rem; /* px-6 py-3 */
+            border-radius: 9999px; /* rounded-full */
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            border-color: #f97316;
+            color: #f97316;
+        }
+
+        /* ==================================================================
+        == NOUVEAU: CSS POUR LE TEXTE FLUIDE (Style Maybe)
+        ==================================================================
+        */
+        .blurry-text-container {
+            font-size: 2.5rem; /* text-4xl */
+            font-weight: 700; /* font-bold */
+            line-height: 1.6; /* leading-relaxed */
+            padding: 2.5rem; /* p-10 */
+            user-select: none; /* Empêche la sélection */
+        }
+        .blurry-text-container span {
+            color: transparent; /* Texte invisible */
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Effet flou blanc */
+            transition: text-shadow 0.3s ease, color 0.3s ease;
+        }
+        .blurry-text-container span:hover {
+            color: #E0E0E0; /* Blanc clair */
+            text-shadow: 0 0 0px rgba(255, 255, 255, 0); /* Plus de flou */
+        }
+        /* Garder l'accent orange pour la fin */
+        .blurry-text-container span.text-orange-600 {
+            color: transparent;
+            text-shadow: 0 0 10px rgba(249, 115, 22, 0.5); /* Effet flou orange */
+        }
+        .blurry-text-container span.text-orange-600:hover {
+            color: #f97316; /* Orange */
+            text-shadow: 0 0 0px rgba(249, 115, 22, 0);
+        }
+
+    </style>
+</head>
+
+<body class="bg-[#0F0F0F] text-gray-200 loading"> <!-- Palette Sombre -->
+
+<!-- Pré-chargeur -->
+<div id="preloader">
+    <div class="loader-logo">
+        Ajiboost
+    </div>
+</div>
+
+<!-- Curseur personnalisé -->
+<div id="cursor-dot"></div>
+<div id="cursor-outline"></div>
+
+<!-- En-tête (Header) -->
+<header id="main-header" class="bg-[#0F0F0F]/80 backdrop-blur-md fixed top-0 z-50 transition-all duration-300 w-full border-b border-gray-800">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <!-- Logo -->
+        <a href="#accueil" class="text-3xl font-extrabold text-orange-600">
+            Ajiboost
+        </a>
+        
+        <!-- Menu Principal (Desktop) -->
+        <div class="hidden md:flex space-x-6 items-center">
+            <a href="#services" class="text-gray-300 hover:text-orange-600 font-medium transition-colors duration-300">Services</a>
+            <a href="#processus" class="text-gray-300 hover:text-orange-600 font-medium transition-colors duration-300">Processus</a>
+            <a href="#faq" class="text-gray-300 hover:text-orange-600 font-medium transition-colors duration-300">FAQ</a>
+        </div>
+
+        <!-- Bouton Contact (Desktop) -->
+        <a href="#" class="open-contact-modal btn-primary">
+            Contactez-nous
+        </a>
+    </nav>
+</header>
+
+
+<!-- ==================================================================
+== DÉBUT DU CONTENU (Scroll normal)
+==================================================================
+-->
+<main>
+
+    <!-- Section 1: Accueil (Style Maybe) -->
+    <section id="accueil" class="min-h-screen flex items-center justify-center pt-32 pb-20">
+        <div class="container mx-auto px-6 text-center flex flex-col items-center">
+            
+            <h1 class="text-5xl md:text-8xl font-extrabold text-white mb-6 leading-tight animate-fade-in">
+                Votre Marketing, <span class="text-orange-600">en clair.</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 animate-fade-in fade-in-delay-1">
+                Ajiboost est l'agence digitale au Maroc qui transforme vos données complexes en résultats simples. Nous parlons le langage de la croissance.
+            </p>
+            <div class="animate-fade-in fade-in-delay-2 mb-16">
+                <a href="#" class="open-contact-modal btn-primary text-lg px-8 py-4">
+                    Démarrer un projet
+                </a>
+            </div>
+
+            <!-- NOUVEAU: Texte Fluide (Style "Maybe" alternatif) -->
+            <div class="w-full max-w-5xl animate-fade-in fade-in-delay-3 blurry-text-container">
+                <span>Pas</span> <span>de</span> <span>jargon.</span> <span>Pas</span> <span>de</span> <span>blabla.</span>
+                <span>Pas</span> <span>de</span> <span>promesses</span> <span>en</span> <span>l'air.</span>
+                <span>Pas</span> <span>de</span> <span>longs</span> <span>rapports.</span> <span>Pas</span> <span>d'attente.</span>
+                <span>Pas</span> <span>de</span> <span>devis</span> <span>cachés.</span>
+                <br>
+                <span class="text-orange-600">Que</span> <span class="text-orange-600">des</span> <span class="text-orange-600">résultats.</span>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Section 2: Marquee (Style Maybe) -->
+    <section id="marquee-services" class="py-12 bg-[#0F0F0F] animate-fade-in">
+        <div class="marquee-container">
+            <div class="marquee-track">
+                <!-- Contenu (doublé) -->
+                <span class="text-xl">STRATÉGIE •</span>
+                <span class="text-xl">SEO •</span>
+                <span class="text-xl">WEB DESIGN •</span>
+                <span class="text-xl">SOCIAL MEDIA •</span>
+                <span class="text-xl">BRANDING •</span>
+                <span class="text-xl">SHOPIFY •</span>
+                <!-- Répétition -->
+                <span class="text-xl">STRATÉGIE •</span>
+                <span class="text-xl">SEO •</span>
+                <span class="text-xl">WEB DESIGN •</span>
+                <span class="text-xl">SOCIAL MEDIA •</span>
+                <span class="text-xl">BRANDING •</span>
+                <span class="text-xl">SHOPIFY •</span>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Section 3: Services (Grille Style Maybe) -->
+    <section id="services" class="py-20 md:py-28 bg-[#0F0F0F]">
+        <div class="container mx-auto px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-orange-600 font-semibold text-lg animate-fade-in">NOS SERVICES</span>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-white mt-4 animate-fade-in fade-in-delay-1">
+                    Tout ce qu'il faut pour grandir.
+                </h2>
+            </div>
+            
+            <!-- Grille de services (Bento) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                <!-- Service 1: SEO -->
+                <div class="feature-card md:col-span-2 animate-fade-in fade-in-delay-1">
+                    <i class="fas fa-search-dollar fa-2x text-orange-600 mb-5"></i>
+                    <h3 class="text-2xl font-bold text-white mb-3">Optimisation SEO</h3>
+                    <p class="text-gray-400">Devenez N°1 sur Google au Maroc. Nous attirons un trafic qualifié qui convertit.</p>
+                </div>
+                <!-- Service 2: Web Design -->
+                <div class="feature-card animate-fade-in fade-in-delay-2">
+                    <i class="fas fa-laptop-code fa-2x text-orange-600 mb-5"></i>
+                    <h3 class="text-2xl font-bold text-white mb-3">Design Web</h3>
+                    <p class="text-gray-400">Sites WordPress & Shopify ultra-rapides, beaux et intelligents.</p>
+                </div>
+                <!-- Service 3: Social Media -->
+                <div class="feature-card animate-fade-in fade-in-delay-3">
+                    <i class="fas fa-thumbs-up fa-2x text-orange-600 mb-5"></i>
+                    <h3 class="text-2xl font-bold text-white mb-3">Réseaux Sociaux</h3>
+                    <p class="text-gray-400">Créez une communauté. Nous gérons vos contenus sur Instagram et LinkedIn.</p>
+                </div>
+                <!-- Service 4: Stratégie -->
+                <div class="feature-card md:col-span-2 animate-fade-in fade-in-delay-4">
+                    <i class="fas fa-brain fa-2x text-orange-600 mb-5"></i>
+                    <h3 class="text-2xl font-bold text-white mb-3">Stratégie & IA</h3>
+                    <p class="text-gray-400">Nous utilisons l'IA pour analyser les données, prédire les tendances et garantir votre croissance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Processus (Style Maybe) -->
+    <section id="processus" class="py-20 md:py-28 bg-[#0F0F0F]">
+        <div class="container mx-auto px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-orange-600 font-semibold text-lg animate-fade-in">COMMENT ÇA MARCHE</span>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-white mt-4 animate-fade-in fade-in-delay-1">
+                    Un processus en 3 étapes claires.
+                </h2>
+            </div>
+            
+            <!-- Grille de processus -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Etape 1 -->
+                <div class="border-t-2 border-orange-600 pt-6 animate-fade-in fade-in-delay-1">
+                    <div class="text-3xl font-extrabold text-white mb-4">01.</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Audit & Stratégie</h3>
+                    <p class="text-gray-400">Nous analysons votre marché, vos concurrents et vos objectifs pour définir un plan d'action.</p>
+                </div>
+                <!-- Etape 2 -->
+                <div class="border-t-2 border-orange-600 pt-6 animate-fade-in fade-in-delay-2">
+                    <div class="text-3xl font-extrabold text-white mb-4">02.</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Création & Déploiement</h3>
+                    <p class="text-gray-400">Nos designers et développeurs donnent vie au projet, en se concentrant sur la performance.</p>
+                </div>
+                <!-- Etape 3 -->
+                <div class="border-t-2 border-orange-600 pt-6 animate-fade-in fade-in-delay-3">
+                    <div class="text-3xl font-extrabold text-white mb-4">03.</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Optimisation & Croissance</h3>
+                    <p class="text-gray-400">Nous ne nous arrêtons pas au lancement. Nous suivons les données et optimisons en continu.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Témoignages (Style Maybe) -->
+    <section id="testimonials" class="py-20 md:py-28 bg-[#0F0F0F]">
+        <div class="container mx-auto px-6 max-w-4xl text-center">
+            <span class="text-orange-600 font-semibold text-lg animate-fade-in">ILS NOUS FONT CONFIANCE</span>
+            <blockquote class="text-3xl md:text-5xl font-semibold text-white my-8 leading-snug animate-fade-in fade-in-delay-1">
+                "Leur expertise SEO a doublé notre trafic en 3 mois. Une équipe pro et efficace !"
+            </blockquote>
+            <p class="text-xl font-medium text-gray-300 animate-fade-in fade-in-delay-2">Fatima Zahra</p>
+            <p class="text-gray-500 animate-fade-in fade-in-delay-2">Gérante, Mama Cuisine</p>
+        </div>
+    </section>
+    
+    <!-- Section 6: FAQ (Accordéon, Style Maybe) -->
+    <section id="faq" class="py-20 md:py-28 bg-[#0F0F0F]">
+        <div class="container mx-auto px-6 max-w-3xl">
+            <div class="text-center mb-16">
+                <span class="text-orange-600 font-semibold text-lg animate-fade-in">DES QUESTIONS ?</span>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-white mt-4 animate-fade-in fade-in-delay-1">
+                    Foire Aux Questions
+                </h2>
+            </div>
+            
+            <div class="space-y-2 animate-fade-in fade-in-delay-2">
+                <!-- Accordéon Item 1 -->
+                <div class="accordion-item">
+                    <button class="accordion-header">
+                        <span>Combien coûte un site web au Maroc ?</span>
+                        <i class="accordion-icon fas fa-chevron-down"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <p>Le prix varie. Un site vitrine simple (WordPress) commence autour de 5 000 DH. Un e-commerce (Shopify) complexe coûtera plus cher. Nous proposons des devis 100% transparents adaptés à votre budget.</p>
+                    </div>
+                </div>
+                <!-- Accordéon Item 2 -->
+                <div class="accordion-item">
+                    <button class="accordion-header">
+                        <span>Pourquoi le SEO est-il crucial au Maroc ?</span>
+                        <i class="accordion-icon fas fa-chevron-down"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <p>Au Maroc, la majorité des clients recherchent sur Google. Si vos concurrents sont en première page et pas vous, vous perdez des clients. Le SEO est le meilleur investissement à long terme pour attirer un trafic qualifié.</p>
+                    </div>
+                </div>
+                <!-- Accordéon Item 3 -->
+                <div class="accordion-item">
+                    <button class="accordion-header">
+                        <span>Combien de temps pour voir des résultats SEO ?</span>
+                        <i class="accordion-icon fas fa-chevron-down"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <p>Le SEO est un marathon. Les premiers résultats significatifs (hausse de trafic, meilleures positions) apparaissent généralement après 3 à 6 mois de travail constant (optimisation technique, création de contenu, etc.).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 7: CTA (Style Maybe) -->
+    <section id="cta" class="py-20 md:py-32 bg-[#141414] border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-6xl font-extrabold text-white mb-8 leading-tight animate-fade-in">
+                Prêt à <span class="text-orange-600">commencer</span> ?
+            </h2>
+            <p class="text-lg md:text-xl text-gray-300 max-w-xl mx-auto mb-12 animate-fade-in fade-in-delay-1">
+                Discutons de votre projet. Nous sommes prêts à vous écouter et à vous proposer des solutions concrètes.
+            </p>
+            <div class="animate-fade-in fade-in-delay-2">
+                <a href="#" class="open-contact-modal btn-primary text-xl px-10 py-4">
+                    Démarrer un projet
+                </a>
+            </div>
+        </div>
+    </section>
+
+</main> 
+
+<!-- Footer (Style Maybe) -->
+<footer class="bg-[#0F0F0F] text-gray-200 py-20 border-t border-gray-800">
+    <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+        <!-- Colonne 1: Logo & Social -->
+        <div>
+            <a href="#accueil" class="text-3xl font-extrabold text-orange-600 mb-4 inline-block">
+                Ajiboost
+            </a>
+            <p class="text-gray-400 mb-6 max-w-xs">
+                Agence digitale créative basée au Maroc.
+            </p>
+            <div class="flex space-x-4">
+                <a href="https://www.linkedin.com/company/aji-boost" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-orange-600 transition duration-300">
+                    <i class="fab fa-linkedin fa-lg"></i>
+                </a>
+                <a href="https://www.instagram.com/ajiboost/" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-orange-600 transition duration-300">
+                    <i class="fab fa-instagram fa-lg"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Colonne 2: Services -->
+        <div>
+            <h4 class="font-bold text-lg text-white mb-4">Services</h4>
+            <ul class="space-y-3">
+                <li><a href="#services" class="text-gray-400 hover:text-orange-600 transition">Optimisation SEO</a></li>
+                <li><a href="#services" class="text-gray-400 hover:text-orange-600 transition">Design Web & Shopify</a></li>
+                <li><a href="#services" class="text-gray-400 hover:text-orange-600 transition">Réseaux Sociaux</a></li>
+            </ul>
+        </div>
+
+        <!-- Colonne 3: Liens Rapides -->
+        <div>
+            <h4 class="font-bold text-lg text-white mb-4">Navigation</h4>
+            <ul class="space-y-3">
+                <li><a href="#processus" class="text-gray-400 hover:text-orange-600 transition">Processus</a></li>
+                <li><a href="#faq" class="text-gray-400 hover:text-orange-600 transition">FAQ</a></li>
+                <li><a href="#" class="open-contact-modal text-gray-400 hover:text-orange-600 transition">Démarrer un projet</a></li>
+            </ul>
+        </div>
+
+        <!-- Colonne 4: Contact -->
+        <div>
+            <h4 class="font-bold text-lg text-white mb-4">Contactez-nous</h4>
+            <p class="text-gray-400 mb-4">
+                Prêt à commencer ? Nous sommes là pour vous écouter.
+            </p>
+            <a href="#" class="open-contact-modal btn-primary text-sm">
+                Envoyer un message
+            </a>
+        </div>
+    </div>
+    <div class="container mx-auto px-6 text-center text-gray-500 border-t border-gray-800 mt-12 pt-8">
+        <p>&copy; 2025 Ajiboost. Tous droits réservés.</p>
+    </div>
+</footer>
+
+    
+<!-- MODALE DE CONTACT (Pop-up) - Formulaire UNIFIÉ (Style Sombre) -->
+<div id="contact-modal" class="modal hidden fixed inset-0 flex items-center justify-center p-6" aria-modal="true" role="dialog">
+    
+    <!-- Overlay (fond flou) -->
+    <div class="modal-overlay absolute inset-0 bg-black/70 backdrop-blur-sm" data-modal-id="contact-modal"></div>
+    
+    
+    <!-- Contenu de la Modale -->
+    <div class="modal-content relative w-11/12 max-w-md bg-[#141414] p-8 rounded-2xl shadow-2xl z-10 mx-auto border border-gray-800"> <!-- Style Sombre -->
+        
+        <!-- Bouton Fermer -->
+        <button class="close-modal-button absolute top-4 right-5 text-gray-500 hover:text-orange-600 text-3xl transition-colors duration-300" data-modal-id="contact-modal">
+            &times;
+        </button>
+        
+        
+        <!-- En-tête de la Modale -->
+        <div class="text-center mb-6">
+            <h2 id="modal-title" class="text-2xl font-extrabold text-white mb-2">
+                Demander un Devis
+            </h2>
+            <p id="modal-subtitle" class="text-sm text-gray-400">
+                Parlez-nous de votre besoin pour ce service.
+            </p>
+        </div>
+        
+        <!-- Formulaire de Contact UNIFIÉ -->
+        <!-- CORRECTION: Ajout du lien Formspree -->
+        <form id="contact-form" class="space-y-4" action="https://formspree.io/f/xgvpdear" method="POST">
+            
+            <!-- Grille Nom & Email -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="contact-nom" class="block text-sm font-medium text-gray-300 mb-1">Nom & Prénom</label>
+                    <input type="text" id="contact-nom" name="Nom" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input">
+                </div>
+                <div>
+                    <label for="contact-email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                    <input type="email" id="contact-email" name="Email" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input">
+                </div>
+            </div>
+
+            <!-- Grille Entreprise & Téléphone -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="contact-entreprise" class="block text-sm font-medium text-gray-300 mb-1">Nom de l'entreprise</label>
+                    <input type="text" id="contact-entreprise" name="Entreprise" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input">
+                </div>
+                <div>
+                    <label for="contact-tel" class="block text-sm font-medium text-gray-300 mb-1">Téléphone</label>
+                    <input type="tel" id="contact-tel" name="Téléphone" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input">
+                </div>
+            </div>
+
+            <!-- Grille Service & Budget -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Champ Service (Intelligent) -->
+                <div>
+                    <label for="contact-service" class="block text-sm font-medium text-gray-300 mb-1">Service demandé</label>
+                    <select id="contact-service" name="Service" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input">
+                        <option value="Demande générale">Demande générale...</option>
+                        <option value="Optimisation SEO">Optimisation SEO</option>
+                        <option value="Création de Site Web (WordPress/Shopify)">Création de Site Web (WordPress/Shopify)</option>
+                        <option value="Gestion Réseaux Sociaux">Gestion Réseaux Sociaux</option>
+                        <option value="Design & Contenu (Canva/Photoshop)">Design & Contenu (Canva/Photoshop)</option>
+                        <option value="Autre demande">Autre demande...</option>
+                    </select>
+                </div>
+                <!-- Champ Budget -->
+                <div>
+                    <label for="contact-budget" class="block text-sm font-medium text-gray-300 mb-1">Budget estimé</label>
+                    <select id="contact-budget" name="Budget" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input">
+                        <option value="" disabled selected invalid>Sélectionctionner un budget...</option>
+                        <option value="< 5000 DH">&lt; 5000 DH</option>
+                        <option value="5000 - 10000 DH">5000 - 10000 DH</option>
+                        <option value="10000 - 20000 DH">10000 - 20000 DH</option>
+                        <option value="+ 20000 DH">&gt; 20000 DH</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Champ Message -->
+            <div>
+                <label for="contact-message" class="block text-sm font-medium text-gray-300 mb-1">Parlez-nous de votre projet</label>
+                <textarea id="contact-message" name="Message" rows="4" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input" placeholder="Quels sont vos objectifs ? Avez-vous une échéance ?"></textarea>
+            </div>
+            
+            <!-- Bouton Envoyer -->
+            <div class="text-center pt-4">
+                <button type="submit" class="w-full btn-primary px-8 py-2.5 text-base flex items-center justify-center gap-2">
+                    <i class="fas fa-paper-plane text-xs"></i>
+                    <span>Envoyer la demande</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Bouton "Retour en Haut" -->
+<a href="#accueil" id="back-to-top" class="hidden fixed bottom-8 right-8 bg-orange-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-orange-700 transition-all duration-300 z-50">
+    <i class="fas fa-arrow-up"></i>
+</a>
+
+
+    
+<!-- ==================================================================
+== JAVASCRIPT
+==================================================================
+-->
+<script>
+    
+    /**
+     * Logique de la Modale UNIFIÉE
+     */
+    const contactModal = document.getElementById('contact-modal');
+    const contactServiceSelect = document.getElementById('contact-service');
+    const modalTitle = document.getElementById('modal-title');
+    const modalSubtitle = document.getElementById('modal-subtitle');
+    const budgetField = document.getElementById('contact-budget').parentElement.parentElement; // Cible le div grid parent
+    const siteField = document.getElementById('contact-site'); // N'existe pas dans ce formulaire
+
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if(modal) {
+            modal.classList.add('is-active');
+            modal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
+        }
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if(modal) {
+            modal.classList.remove('is-active');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.classList.remove('modal-open');
+            }, 300);
+        }
+    }
+
+    function openContactModal(serviceName = null) {
+        if (event) {
+            event.preventDefault();
+        }
+        
+        if (serviceName) {
+            // Mode "Demander un Devis"
+            if (modalTitle) modalTitle.innerText = "Demander un Devis";
+            if (modalSubtitle) modalSubtitle.innerText = "Parlez-nous de votre besoin pour ce service.";
+            if (contactServiceSelect) contactServiceSelect.value = serviceName;
+            if (budgetField) budgetField.classList.remove('hidden');
+        } else {
+            // Mode "Contactez-nous"
+            if (modalTitle) modalTitle.innerText = "Contactez-nous";
+            if (modalSubtitle) modalSubtitle.innerText = "Dites-nous en plus sur votre projet !";
+            if (contactServiceSelect) contactServiceSelect.value = "Demande générale";
+            if (budgetField) budgetField.classList.remove('hidden'); // Gardons le budget visible
+        }
+        
+        openModal('contact-modal');
+    }
+
+    const openContactModalButtons = document.querySelectorAll('.open-contact-modal');
+    openContactModalButtons.forEach(button => {
+        button.addEventListener('click', () => openContactModal());
+    });
+
+    const allCloseButtons = document.querySelectorAll('.close-modal-button');
+    const allOverlays = document.querySelectorAll('.modal-overlay');
+
+    allCloseButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modalId = button.closest('.modal').id;
+            closeModal(modalId);
+        });
+    });
+
+    allOverlays.forEach(overlay => {
+        overlay.addEventListener('click', () => {
+            const modalId = overlay.closest('.modal').id;
+            closeModal(modalId);
+        });
+    });
+
+
+    // Exécute le code une fois que le DOM est chargé
+    document.addEventListener('DOMContentLoaded', () => {
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        /**
+         * Gestion du pré-chargeur (Preloader)
+         */
+        const preloader = document.getElementById('preloader');
+        setTimeout(() => {
+            if (preloader) {
+                preloader.classList.add('hidden');
+                document.body.classList.remove('loading');
+            }
+        }, 1500); 
+        window.addEventListener('load', () => {
+            if (preloader) {
+                preloader.classList.add('hidden');
+                document.body.classList.remove('loading');
+            }
+        });
+
+
+        /**
+         * Gestion du curseur (Orange)
+         */
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+        let mouseX = 0, mouseY = 0, outlineX = 0, outlineY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        
+        const animateCursor = () => {
+            if (!cursorDot || !cursorOutline) return;
+            cursorDot.style.left = `${mouseX}px`;
+            cursorDot.style.top = `${mouseY}px`;
+            outlineX += (mouseX - outlineX) * 0.15;
+            outlineY += (mouseY - outlineY) * 0.15;
+            cursorOutline.style.left = `${outlineX}px`;
+            cursorOutline.style.top = `${outlineY}px`;
+            requestAnimationFrame(animateCursor);
+        };
+        requestAnimationFrame(animateCursor);
+
+        // Effet "Magnétique" (Style Dayos)
+        const hoverElements = document.querySelectorAll('a, button, .feature-card, .accordion-header, .blurry-text-container span');
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                if (cursorDot) cursorDot.classList.add('hover');
+                if (cursorOutline) cursorOutline.classList.add('hover');
+            });
+            el.addEventListener('mouseleave', () => {
+                if (cursorDot) cursorDot.classList.remove('hover');
+                if (cursorOutline) cursorOutline.classList.remove('hover');
+            });
+        });
+
+        
+        /**
+         * Logique pour l'Accordéon FAQ
+         */
+        const accordionItems = document.querySelectorAll('.accordion-item');
+        accordionItems.forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            const content = item.querySelector('.accordion-content');
+            const icon = item.querySelector('.accordion-icon');
+
+            if (header && content && icon) {
+                header.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+
+                    if (isActive) {
+                        item.classList.remove('active');
+                        content.style.maxHeight = '0px';
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        item.classList.add('active');
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            }
+        });
+
+
+        /**
+         * Animations d'entrée (Fade-in)
+         */
+        const animatedElements = document.querySelectorAll('.animate-fade-in');
+        const observerOptions = {
+            root: null, // Observe par rapport au viewport
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const animationObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    // Ajout d'une animation GSAP simple
+                    gsap.to(entry.target, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        ease: "power3.out"
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        animatedElements.forEach(el => {
+            // Style initial pour GSAP
+            gsap.set(el, { opacity: 0, y: 30 }); 
+            animationObserver.observe(el);
+        });
+
+
+        /**
+         * Bouton "Retour en Haut"
+         */
+        const backToTopButton = document.getElementById('back-to-top');
+        if (backToTopButton) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopButton.classList.remove('hidden');
+                } else {
+                    backToTopButton.classList.add('hidden');
+                }
+            });
+        }
+
+    });
+</script>
+
+</body>
+</html>
