@@ -7,7 +7,6 @@
     <!-- ==================================================================
     == SOLUTION FAVICON (Lien Absolu GitHub)
     ================================================================== -->
-    <!-- J'utilise le lien direct vers ton GitHub pour forcer l'affichage -->
     <link rel="icon" href="https://raw.githubusercontent.com/elkissiimad9/ajiboost/main/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="https://raw.githubusercontent.com/elkissiimad9/ajiboost/main/favicon.ico" type="image/x-icon">
 
@@ -27,7 +26,7 @@
     <!-- Font Awesome (pour les icônes) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <!-- GSAP (Pour les animations de fade-in) -->
+    <!-- GSAP (Pour les animations de fade-in et MODALES) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
@@ -114,16 +113,24 @@
         }
 
         /* ==================================================================
-        == CSS POUR LA MODALE (MODE SOMBRE)
+        == CSS POUR LA MODALE (MODIFIÉ POUR GSAP)
         ==================================================================
         */
-        .modal { z-index: 100; visibility: hidden; transition: visibility 0.3s ease-out; }
+        .modal { z-index: 100; visibility: hidden; } /* Transition gérée par JS maintenant */
         .modal.is-active { visibility: visible; }
         body.modal-open { overflow: hidden; }
-        .modal-overlay { opacity: 0; transition: backdrop-filter 0.2s ease-out, opacity 0.2s ease-out; }
-        .modal.is-active .modal-overlay { opacity: 1; backdrop-filter: blur(5px); }
-        .modal-content { opacity: 0; transform: scale(0.9); transition: opacity 0.2s ease-out, transform 0.2s ease-out; }
-        .modal.is-active .modal-content { opacity: 1; transform: scale(1); }
+        
+        .modal-overlay { 
+            opacity: 0; 
+            /* Pas de transition CSS ici, GSAP s'en occupe */
+        }
+        
+        .modal-content { 
+            opacity: 0; 
+            transform: scale(0.9); 
+            /* Pas de transition CSS ici, GSAP s'en occupe */
+        }
+
         .modal-dark-input { background-color: #1A1A1A; border: 1px solid #333; color: #E0E0E0; transition: border-color 0.3s ease; }
         .modal-dark-input:focus { border-color: #f97316; background-color: #222; ring: 0; outline: none; }
         .modal select:required:invalid { color: #777; }
@@ -175,10 +182,24 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            cursor: pointer; /* Indique que c'est cliquable */
         }
         .feature-card:hover {
             border-color: #f97316; /* Bordure Orange */
             transform: translateY(-5px);
+        }
+        /* Petit indicateur "+" pour montrer que c'est cliquable */
+        .feature-card::after {
+            content: '+';
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+        .feature-card:hover::after {
+            color: #f97316;
         }
 
         /* ==================================================================
@@ -379,7 +400,7 @@
     </section>
 
 
-    <!-- Section 3: Services (Grille Style Maybe) -->
+    <!-- Section 3: Services (Grille Style Maybe + Interactions) -->
     <section id="services" class="py-20 md:py-28 bg-[#0F0F0F]">
         <div class="container mx-auto px-6">
             <div class="text-center max-w-2xl mx-auto mb-16">
@@ -387,30 +408,31 @@
                 <h2 class="text-4xl md:text-5xl font-extrabold text-white mt-4 animate-fade-in fade-in-delay-1">
                     Tout ce qu'il faut pour grandir.
                 </h2>
+                <p class="text-gray-400 mt-4 animate-fade-in fade-in-delay-2">(Cliquez sur un service pour voir les détails)</p>
             </div>
             
             <!-- Grille de services (Bento) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
                 <!-- Service 1: SEO -->
-                <div class="feature-card md:col-span-2 animate-fade-in fade-in-delay-1">
+                <div class="feature-card md:col-span-2 animate-fade-in fade-in-delay-1" onclick="openServiceModal('seo')">
                     <i class="fas fa-search-dollar fa-2x text-orange-600 mb-5"></i>
                     <h3 class="text-2xl font-bold text-white mb-3">Optimisation SEO</h3>
                     <p class="text-gray-400">Devenez N°1 sur Google au Maroc. Nous attirons un trafic qualifié qui convertit.</p>
                 </div>
                 <!-- Service 2: Web Design -->
-                <div class="feature-card animate-fade-in fade-in-delay-2">
+                <div class="feature-card animate-fade-in fade-in-delay-2" onclick="openServiceModal('web')">
                     <i class="fas fa-laptop-code fa-2x text-orange-600 mb-5"></i>
                     <h3 class="text-2xl font-bold text-white mb-3">Design Web</h3>
                     <p class="text-gray-400">Sites WordPress & Shopify ultra-rapides, beaux et intelligents.</p>
                 </div>
                 <!-- Service 3: Social Media -->
-                <div class="feature-card animate-fade-in fade-in-delay-3">
+                <div class="feature-card animate-fade-in fade-in-delay-3" onclick="openServiceModal('social')">
                     <i class="fas fa-thumbs-up fa-2x text-orange-600 mb-5"></i>
                     <h3 class="text-2xl font-bold text-white mb-3">Réseaux Sociaux</h3>
                     <p class="text-gray-400">Créez une communauté. Nous gérons vos contenus sur Instagram et LinkedIn.</p>
                 </div>
                 <!-- Service 4: Stratégie -->
-                <div class="feature-card md:col-span-2 animate-fade-in fade-in-delay-4">
+                <div class="feature-card md:col-span-2 animate-fade-in fade-in-delay-4" onclick="openServiceModal('strategy')">
                     <i class="fas fa-brain fa-2x text-orange-600 mb-5"></i>
                     <h3 class="text-2xl font-bold text-white mb-3">Stratégie & IA</h3>
                     <p class="text-gray-400">Nous utilisons l'IA pour analyser les données, prédire les tendances et garantir votre croissance.</p>
@@ -587,24 +609,13 @@
 </footer>
 
     
-<!-- MODALE DE CONTACT (Pop-up) - Formulaire UNIFIÉ (Style Sombre) -->
+<!-- MODALE DE CONTACT (Pop-up) - Formulaire UNIFIÉ -->
 <div id="contact-modal" class="modal hidden fixed inset-0 flex items-center justify-center p-6" aria-modal="true" role="dialog">
-    
-    <!-- Overlay (fond flou) -->
     <div class="modal-overlay absolute inset-0 bg-black/70 backdrop-blur-sm" data-modal-id="contact-modal"></div>
-    
-    
-    <!-- Contenu de la Modale -->
-    <!-- CORRECTION UI/UX: Ajout de max-h-[90vh] et overflow-y-auto pour le scroll mobile -->
-    <div class="modal-content relative w-11/12 max-w-md bg-[#141414] p-8 rounded-2xl shadow-2xl z-10 mx-auto border border-gray-800 max-h-[90vh] overflow-y-auto"> <!-- Style Sombre -->
-        
-        <!-- Bouton Fermer -->
+    <div class="modal-content relative w-11/12 max-w-md bg-[#141414] p-8 rounded-2xl shadow-2xl z-10 mx-auto border border-gray-800 max-h-[90vh] overflow-y-auto">
         <button class="close-modal-button absolute top-4 right-5 text-gray-500 hover:text-orange-600 text-3xl transition-colors duration-300" data-modal-id="contact-modal">
             &times;
         </button>
-        
-        
-        <!-- En-tête de la Modale -->
         <div class="text-center mb-6">
             <h2 id="modal-title" class="text-2xl font-extrabold text-white mb-2">
                 Demander un Devis
@@ -613,11 +624,7 @@
                 Parlez-nous de votre besoin pour ce service.
             </p>
         </div>
-        
-        <!-- Formulaire de Contact UNIFIÉ -->
         <form id="contact-form" class="space-y-4" action="https://formspree.io/f/xgvpdear" method="POST">
-            
-            <!-- Grille Nom & Email -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="contact-nom" class="block text-sm font-medium text-gray-300 mb-1">Nom & Prénom</label>
@@ -628,8 +635,6 @@
                     <input type="email" id="contact-email" name="Email" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input">
                 </div>
             </div>
-
-            <!-- Grille Entreprise & Téléphone -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="contact-entreprise" class="block text-sm font-medium text-gray-300 mb-1">Nom de l'entreprise</label>
@@ -640,10 +645,7 @@
                     <input type="tel" id="contact-tel" name="Téléphone" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input">
                 </div>
             </div>
-
-            <!-- Grille Service & Budget -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Champ Service (Intelligent) -->
                 <div>
                     <label for="contact-service" class="block text-sm font-medium text-gray-300 mb-1">Service demandé</label>
                     <select id="contact-service" name="Service" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input">
@@ -655,7 +657,6 @@
                         <option value="Autre demande">Autre demande...</option>
                     </select>
                 </div>
-                <!-- Champ Budget -->
                 <div>
                     <label for="contact-budget" class="block text-sm font-medium text-gray-300 mb-1">Budget estimé</label>
                     <select id="contact-budget" name="Budget" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input">
@@ -667,14 +668,10 @@
                     </select>
                 </div>
             </div>
-            
-            <!-- Champ Message -->
             <div>
                 <label for="contact-message" class="block text-sm font-medium text-gray-300 mb-1">Parlez-nous de votre projet</label>
                 <textarea id="contact-message" name="Message" rows="4" required class="w-full px-4 py-2 border rounded-lg text-sm modal-dark-input" placeholder="Quels sont vos objectifs ? Avez-vous une échéance ?"></textarea>
             </div>
-            
-            <!-- Bouton Envoyer -->
             <div class="text-center pt-4">
                 <button type="submit" class="w-full btn-primary px-8 py-2.5 text-base flex items-center justify-center gap-2">
                     <i class="fas fa-paper-plane text-xs"></i>
@@ -682,6 +679,39 @@
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- NOUVEAU: MODALE DE DÉTAILS SERVICE (Explications Maroc) -->
+<div id="service-details-modal" class="modal hidden fixed inset-0 flex items-center justify-center p-6" aria-modal="true" role="dialog">
+    <div class="modal-overlay absolute inset-0 bg-black/70 backdrop-blur-sm" data-modal-id="service-details-modal"></div>
+    <div class="modal-content relative w-11/12 max-w-2xl bg-[#141414] p-8 rounded-2xl shadow-2xl z-20 mx-auto border border-gray-800 max-h-[90vh] overflow-y-auto">
+        <button class="close-modal-button absolute top-4 right-5 text-gray-500 hover:text-orange-600 text-3xl transition-colors duration-300" data-modal-id="service-details-modal">
+            &times;
+        </button>
+        
+        <div class="text-left">
+            <div class="mb-6">
+                <span class="text-orange-600 font-bold tracking-wider text-sm">DÉTAILS DU SERVICE</span>
+                <h2 id="service-modal-title" class="text-3xl md:text-4xl font-extrabold text-white mt-2 mb-4">
+                    <!-- Titre JS -->
+                </h2>
+                <div class="w-20 h-1 bg-orange-600 rounded-full"></div>
+            </div>
+            
+            <div id="service-modal-content" class="text-gray-300 space-y-4 text-lg leading-relaxed">
+                <!-- Contenu JS -->
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-800 flex flex-col md:flex-row gap-4 items-center">
+                <button onclick="openContactFromService()" class="btn-primary flex-1 w-full md:w-auto text-center cursor-pointer">
+                    Demander ce service
+                </button>
+                <button class="close-modal-button btn-secondary flex-1 w-full md:w-auto text-center cursor-pointer" data-modal-id="service-details-modal">
+                    Fermer
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -700,114 +730,234 @@
 <script>
     
     /**
-     * Logique de la Modale UNIFIÉE
+     * Données des Services (Contenu spécifique Maroc)
+     */
+    const serviceDetails = {
+        'seo': {
+            title: "Optimisation SEO au Maroc",
+            content: `
+                <p><strong class="text-white">Le marché marocain est unique.</strong> Google.ma ne fonctionne pas comme Google.com ou Google.fr. L'algorithme privilégie de plus en plus le contenu local et pertinent.</p>
+                <p>Notre approche SEO est spécialement conçue pour le Maroc :</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-400">
+                    <li><strong>Mots-clés hybrides :</strong> Nous ciblons les recherches en Français, mais aussi les expressions locales en Darija (en caractères latins ou arabes) que vos clients utilisent réellement.</li>
+                    <li><strong>Référencement Local (Google Maps) :</strong> Crucial au Maroc. Nous optimisons votre fiche Google Business Profile pour que vous soyez le premier choix dans votre ville (Casablanca, Rabat, Marrakech, etc.).</li>
+                    <li><strong>Backlinks de qualité :</strong> Nous construisons votre autorité avec des liens provenant de sites marocains et internationaux de confiance.</li>
+                </ul>
+                <p class="mt-4">Résultat : Vous n'êtes pas juste visible, vous êtes <strong class="text-orange-600">incontournable</strong> sur votre marché.</p>
+            `
+        },
+        'web': {
+            title: "Design Web & Performance",
+            content: `
+                <p>Au Maroc, plus de <strong class="text-white">80% du trafic web passe par le mobile</strong>. Un site web lent ou mal adapté aux smartphones vous fait perdre des clients instantanément.</p>
+                <p>Nous créons des sites web (WordPress, Shopify ou sur-mesure) qui sont :</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-400">
+                    <li><strong>Ultra-Rapides :</strong> Optimisés pour les connexions 4G locales, assurant un chargement immédiat.</li>
+                    <li><strong>Mobile-First :</strong> Le design est pensé d'abord pour le téléphone, puis adapté au PC.</li>
+                    <li><strong>Expérience Utilisateur (UX) Marocaine :</strong> Nous adaptons les parcours clients aux habitudes locales (boutons WhatsApp bien visibles, formulaires simplifiés, confiance rassurée).</li>
+                </ul>
+                <p class="mt-4">Votre site ne sera pas juste une vitrine, mais votre <strong class="text-orange-600">meilleur commercial</strong> 24h/24.</p>
+            `
+        },
+        'social': {
+            title: "Réseaux Sociaux & Branding",
+            content: `
+                <p>Les Marocains passent des heures sur les réseaux sociaux. C'est là que se construit la confiance aujourd'hui.</p>
+                <p>Notre stratégie Social Media ne se limite pas à poster des jolies images :</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-400">
+                    <li><strong>Instagram & TikTok :</strong> Création de contenu visuel fort (Reels, Stories) qui capte l'attention en moins de 3 secondes.</li>
+                    <li><strong>LinkedIn B2B :</strong> Pour les entreprises, nous développons votre image de marque employeur et générons des leads qualifiés auprès des décideurs marocains.</li>
+                    <li><strong>Community Management :</strong> Nous interagissons avec votre communauté avec le bon ton (professionnel ou décontracté/darija) pour créer de l'engagement.</li>
+                </ul>
+            `
+        },
+        'strategy': {
+            title: "Stratégie Digitale & IA",
+            content: `
+                <p>Ne naviguez pas à vue. Le marché digital marocain évolue vite, et la concurrence se digitalise.</p>
+                <p>Nous utilisons l'Intelligence Artificielle et l'analyse de données pour :</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-400">
+                    <li><strong>Analyser vos concurrents :</strong> Savoir exactement ce qu'ils font et comment faire mieux.</li>
+                    <li><strong>Prédire les tendances :</strong> Anticiper les besoins de vos clients marocains avant qu'ils ne les expriment.</li>
+                    <li><strong>Optimiser vos budgets :</strong> Arrêter de gaspiller de l'argent dans des publicités qui ne rapportent rien.</li>
+                </ul>
+                <p class="mt-4">Nous transformons vos données brutes en <strong class="text-orange-600">plan d'action clair</strong>.</p>
+            `
+        }
+    };
+
+    /**
+     * Logique des Modales
      */
     const contactModal = document.getElementById('contact-modal');
+    const serviceDetailsModal = document.getElementById('service-details-modal');
+    
+    // Champs de la modale Service
+    const serviceModalTitle = document.getElementById('service-modal-title');
+    const serviceModalContent = document.getElementById('service-modal-content');
+    let currentServiceKey = ''; // Pour mémoriser quel service est ouvert
+
+    // Champs du formulaire contact
     const contactServiceSelect = document.getElementById('contact-service');
     const modalTitle = document.getElementById('modal-title');
     const modalSubtitle = document.getElementById('modal-subtitle');
-    const budgetField = document.getElementById('contact-budget').parentElement.parentElement; // Cible le div grid parent
-    const siteField = document.getElementById('contact-site'); // N'existe pas dans ce formulaire
+    const budgetField = document.getElementById('contact-budget').parentElement.parentElement;
 
+    // Nouvelle fonction générique pour fermer une modale avec animation de sortie
+    function closeModalGeneric(modalId) {
+        const modal = document.getElementById(modalId);
+        if(!modal) return;
+        
+        const overlay = modal.querySelector('.modal-overlay');
+        const content = modal.querySelector('.modal-content');
+
+        // Animation de fermeture
+        const tl = gsap.timeline({
+            onComplete: () => {
+                modal.classList.remove('is-active');
+                modal.classList.add('hidden');
+                document.body.classList.remove('modal-open');
+                
+                // Reset styles GSAP pour la prochaine ouverture propre
+                gsap.set(overlay, { clearProps: "all" });
+                gsap.set(content, { clearProps: "all" });
+            }
+        });
+
+        tl.to(content, { opacity: 0, scale: 0.8, duration: 0.2, ease: "power2.in" }, 0)
+          .to(overlay, { opacity: 0, duration: 0.2 }, 0);
+    }
+
+
+    // Ouvre la modale de détails service avec GSAP MOTION
+    function openServiceModal(serviceKey) {
+        const data = serviceDetails[serviceKey];
+        if (data) {
+            currentServiceKey = serviceKey; // Sauvegarde la clé
+            serviceModalTitle.innerText = data.title;
+            serviceModalContent.innerHTML = data.content;
+            
+            // Préparation du DOM
+            const modal = document.getElementById('service-details-modal');
+            const overlay = modal.querySelector('.modal-overlay');
+            const content = modal.querySelector('.modal-content');
+            
+            modal.classList.remove('hidden');
+            // Force reflow
+            void modal.offsetWidth; 
+            modal.classList.add('is-active');
+            document.body.classList.add('modal-open');
+
+            // Animation GSAP "Motion"
+            // État initial
+            gsap.set(overlay, { opacity: 0 });
+            gsap.set(content, { opacity: 0, scale: 0.5, y: 50 });
+
+            // Animation
+            const tl = gsap.timeline();
+            tl.to(overlay, { opacity: 1, duration: 0.3, ease: "power2.out" })
+              .to(content, { 
+                  opacity: 1, 
+                  scale: 1, 
+                  y: 0, 
+                  duration: 0.5, 
+                  ease: "back.out(1.7)" // L'effet rebond "Motion"
+              }, "-=0.2");
+        }
+    }
+
+    // Ancienne fonction openModal (pour la compatibilité, mais on va essayer d'utiliser GSAP partout si possible)
     function openModal(modalId) {
         const modal = document.getElementById(modalId);
         if(modal) {
-            modal.classList.add('is-active');
+            const overlay = modal.querySelector('.modal-overlay');
+            const content = modal.querySelector('.modal-content');
+            
             modal.classList.remove('hidden');
+            modal.classList.add('is-active');
             document.body.classList.add('modal-open');
+            
+            // Animation simple pour le formulaire de contact aussi
+            gsap.fromTo(overlay, {opacity: 0}, {opacity: 1, duration: 0.3});
+            gsap.fromTo(content, {opacity: 0, scale: 0.9}, {opacity: 1, scale: 1, duration: 0.3, ease: "power2.out"});
         }
     }
-
+    
+    // Fermeture propre
     function closeModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if(modal) {
-            modal.classList.remove('is-active');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                document.body.classList.remove('modal-open');
-            }, 300);
-        }
+        closeModalGeneric(modalId);
+    }
+
+    // Transition de la modale service -> modale contact
+    function openContactFromService() {
+        // Ferme la modale service
+        closeModalGeneric('service-details-modal');
+        
+        // Petite pause pour laisser la fermeture se faire, puis ouvrir contact
+        setTimeout(() => {
+            // Mapper la clé de service vers le texte du select
+            let serviceName = "Demande générale";
+            if(currentServiceKey === 'seo') serviceName = "Optimisation SEO";
+            if(currentServiceKey === 'web') serviceName = "Création de Site Web (WordPress/Shopify)";
+            if(currentServiceKey === 'social') serviceName = "Gestion Réseaux Sociaux";
+            if(currentServiceKey === 'strategy') serviceName = "Autre demande";
+
+            openContactModal(serviceName);
+        }, 300);
     }
 
     function openContactModal(serviceName = null) {
-        if (event) {
-            event.preventDefault();
-        }
+        if (event && event.type === 'click') event.preventDefault();
         
         if (serviceName) {
-            // Mode "Demander un Devis"
             if (modalTitle) modalTitle.innerText = "Demander un Devis";
             if (modalSubtitle) modalSubtitle.innerText = "Parlez-nous de votre besoin pour ce service.";
             if (contactServiceSelect) contactServiceSelect.value = serviceName;
             if (budgetField) budgetField.classList.remove('hidden');
         } else {
-            // Mode "Contactez-nous"
             if (modalTitle) modalTitle.innerText = "Contactez-nous";
             if (modalSubtitle) modalSubtitle.innerText = "Dites-nous en plus sur votre projet !";
             if (contactServiceSelect) contactServiceSelect.value = "Demande générale";
-            if (budgetField) budgetField.classList.remove('hidden'); // Gardons le budget visible
+            if (budgetField) budgetField.classList.remove('hidden');
         }
-        
         openModal('contact-modal');
     }
 
-    const openContactModalButtons = document.querySelectorAll('.open-contact-modal');
-    openContactModalButtons.forEach(button => {
+    // Event Listeners
+    document.querySelectorAll('.open-contact-modal').forEach(button => {
         button.addEventListener('click', () => openContactModal());
     });
 
-    const allCloseButtons = document.querySelectorAll('.close-modal-button');
-    const allOverlays = document.querySelectorAll('.modal-overlay');
-
-    allCloseButtons.forEach(button => {
+    document.querySelectorAll('.close-modal-button').forEach(button => {
         button.addEventListener('click', () => {
-            const modalId = button.closest('.modal').id;
-            closeModal(modalId);
+            const modalId = button.getAttribute('data-modal-id');
+            closeModalGeneric(modalId);
         });
     });
 
-    allOverlays.forEach(overlay => {
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
         overlay.addEventListener('click', () => {
-            const modalId = overlay.closest('.modal').id;
-            closeModal(modalId);
+            const modalId = overlay.getAttribute('data-modal-id');
+            closeModalGeneric(modalId);
         });
     });
 
 
-    // Exécute le code une fois que le DOM est chargé
+    // Init
     document.addEventListener('DOMContentLoaded', () => {
-
         gsap.registerPlugin(ScrollTrigger);
 
-        /**
-         * Gestion du pré-chargeur (Preloader)
-         */
+        // Preloader
         const preloader = document.getElementById('preloader');
-        setTimeout(() => {
-            if (preloader) {
-                preloader.classList.add('hidden');
-                document.body.classList.remove('loading');
-            }
-        }, 1500); 
-        window.addEventListener('load', () => {
-            if (preloader) {
-                preloader.classList.add('hidden');
-                document.body.classList.remove('loading');
-            }
-        });
+        setTimeout(() => { if (preloader) { preloader.classList.add('hidden'); document.body.classList.remove('loading'); } }, 1500); 
+        window.addEventListener('load', () => { if (preloader) { preloader.classList.add('hidden'); document.body.classList.remove('loading'); } });
 
-
-        /**
-         * Gestion du curseur (Orange)
-         */
+        // Cursor
         const cursorDot = document.getElementById('cursor-dot');
         const cursorOutline = document.getElementById('cursor-outline');
         let mouseX = 0, mouseY = 0, outlineX = 0, outlineY = 0;
 
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
+        window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
         
         const animateCursor = () => {
             if (!cursorDot || !cursorOutline) return;
@@ -821,94 +971,49 @@
         };
         requestAnimationFrame(animateCursor);
 
-        // Effet "Magnétique" (Style Dayos)
         const hoverElements = document.querySelectorAll('a, button, .feature-card, .accordion-header, .blurry-text-container span');
         hoverElements.forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                if (cursorDot) cursorDot.classList.add('hover');
-                if (cursorOutline) cursorOutline.classList.add('hover');
-            });
-            el.addEventListener('mouseleave', () => {
-                if (cursorDot) cursorDot.classList.remove('hover');
-                if (cursorOutline) cursorOutline.classList.remove('hover');
-            });
+            el.addEventListener('mouseenter', () => { if (cursorDot) cursorDot.classList.add('hover'); if (cursorOutline) cursorOutline.classList.add('hover'); });
+            el.addEventListener('mouseleave', () => { if (cursorDot) cursorDot.classList.remove('hover'); if (cursorOutline) cursorOutline.classList.remove('hover'); });
         });
 
-        
-        /**
-         * Logique pour l'Accordéon FAQ
-         */
+        // FAQ
         const accordionItems = document.querySelectorAll('.accordion-item');
         accordionItems.forEach(item => {
             const header = item.querySelector('.accordion-header');
             const content = item.querySelector('.accordion-content');
             const icon = item.querySelector('.accordion-icon');
-
             if (header && content && icon) {
                 header.addEventListener('click', () => {
                     const isActive = item.classList.contains('active');
-
-                    if (isActive) {
-                        item.classList.remove('active');
-                        content.style.maxHeight = '0px';
-                        icon.style.transform = 'rotate(0deg)';
-                    } else {
-                        item.classList.add('active');
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                        icon.style.transform = 'rotate(180deg)';
-                    }
+                    if (isActive) { item.classList.remove('active'); content.style.maxHeight = '0px'; icon.style.transform = 'rotate(0deg)'; } 
+                    else { item.classList.add('active'); content.style.maxHeight = content.scrollHeight + 'px'; icon.style.transform = 'rotate(180deg)'; }
                 });
             }
         });
 
-
-        /**
-         * Animations d'entrée (Fade-in)
-         */
+        // Fade In
         const animatedElements = document.querySelectorAll('.animate-fade-in');
-        const observerOptions = {
-            root: null, // Observe par rapport au viewport
-            rootMargin: '0px',
-            threshold: 0.1
-        };
-
+        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
         const animationObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-visible');
-                    // Ajout d'une animation GSAP simple
-                    gsap.to(entry.target, {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.8,
-                        ease: "power3.out"
-                    });
+                    gsap.to(entry.target, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" });
                     observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);
+        animatedElements.forEach(el => { gsap.set(el, { opacity: 0, y: 30 }); animationObserver.observe(el); });
 
-        animatedElements.forEach(el => {
-            // Style initial pour GSAP
-            gsap.set(el, { opacity: 0, y: 30 }); 
-            animationObserver.observe(el);
-        });
-
-
-        /**
-         * Bouton "Retour en Haut"
-         */
+        // Back to top
         const backToTopButton = document.getElementById('back-to-top');
         if (backToTopButton) {
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 300) {
-                    backToTopButton.classList.remove('hidden');
-                } else {
-                    backToTopButton.classList.add('hidden');
-                }
+                if (window.scrollY > 300) backToTopButton.classList.remove('hidden');
+                else backToTopButton.classList.add('hidden');
             });
         }
-
     });
 </script>
 
